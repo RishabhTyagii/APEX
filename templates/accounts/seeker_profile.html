@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.username }}</h1>
+                <p>{{ user.email }}</p>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                {% for field in form %}
+                    <div class="form-group {% if field.name == 'bio' or field.name == 'skills' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <span class="error">{{ field.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if profile.resume %}
+                <div class="current-resume">
+                    <p><strong>Current Resume:</strong> 
+                        <a href="{{ profile.resume.url }}" target="_blank">{{ profile.resume.name }}</a>
+                    </p>
+                </div>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

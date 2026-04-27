@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply - {{ job.title }} - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="apply-container">
+        <div class="apply-header">
+            <h1>Apply for {{ job.title }}</h1>
+            <p>{{ job.recruiter.company_name }}</p>
+        </div>
+
+        <div class="apply-info">
+            <h3>Your Profile Summary</h3>
+            <p><strong>Skills:</strong> {{ user.seeker_profile.skills }}</p>
+            <p><strong>Experience:</strong> {{ user.seeker_profile.experience_years }} years</p>
+            {% if user.seeker_profile.resume %}
+                <p><strong>Resume:</strong> <a href="{{ user.seeker_profile.resume.url }}" target="_blank">View Resume</a></p>
+            {% else %}
+                <p class="warning">⚠️ No resume uploaded. <a href="{% url 'seeker_profile' %}">Upload now</a></p>
+            {% endif %}
+        </div>
+
+        <form method="POST" class="apply-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <span class="error">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+                <a href="{% url 'job_detail' job.pk %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

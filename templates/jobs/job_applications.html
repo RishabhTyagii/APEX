@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Applications - {{ job.title }} - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1>Applications for {{ job.title }}</h1>
+            <p>{{ applications|length }} total applications</p>
+        </div>
+        <a href="{% url 'recruiter_jobs' %}" class="btn btn-outline">Back to Jobs</a>
+    </div>
+
+    <div class="sort-options">
+        <span>Sort by:</span>
+        <a href="?sort=ats" class="{% if sort_by == 'ats' %}active{% endif %}">ATS Score</a>
+        <a href="?sort=date" class="{% if sort_by == 'date' %}active{% endif %}">Date</a>
+        <a href="?sort=status" class="{% if sort_by == 'status' %}active{% endif %}">Status</a>
+    </div>
+
+    {% if applications %}
+        <div class="applications-grid">
+            {% for app in applications %}
+                <div class="applicant-card">
+                    <div class="applicant-header">
+                        <div class="applicant-avatar">
+                            {{ app.seeker.user.username|slice:":1"|upper }}
+                        </div>
+                        <div class="applicant-info">
+                            <h3>{{ app.seeker.user.username }}</h3>
+                            <p>{{ app.seeker.user.email }}</p>
+                        </div>
+                        <div class="ats-badge">
+                            <span class="score">{{ app.ats_score|floatformat:0 }}%</span>
+                            <span class="label">ATS</span>
+                        </div>
+                    </div>
+
+                    <div class="applicant-details">
+                        <p><strong>Experience:</strong> {{ app.seeker.experience_years }} years</p>
+                        <p><strong>Location:</strong> {{ app.seeker.location|default:"Not specified" }}</p>
+                        <p><strong>Skills:</strong> {{ app.seeker.skills|truncatewords:10 }}</p>
+                    </div>
+
+                    {% if app.seeker.resume %}
+                        <a href="{{ app.seeker.resume.url }}" target="_blank" class="resume-link">📄 View Resume</a>
+                    {% endif %}
+
+                    <div class="applicant-status">
+                        <span class="status status-{{ app.status }}">{{ app.get_status_display }}</span>
+                        <span class="applied-date">Applied {{ app.applied_at|timesince }} ago</span>
+                    </div>
+
+                    <div class="applicant-actions">
+                        <form method="POST" action="{% url 'update_application_status' app.pk %}" class="status-form">
+                            {% csrf_token %}
+                            <select name="status" onchange="this.form.submit()">
+                                {% for value, label in app.STATUS_CHOICES %}
+                                    <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                        <a href="{% url 'view_applicant' app.pk %}" class="btn btn-sm">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>No applications yet</h2>
+            <p>Share your job posting to get applications</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

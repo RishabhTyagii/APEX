@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ application.seeker.user.username }} - Applicant Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{% url 'job_applications' application.job.pk %}" class="back-link">← Back to Applications</a>
+
+    <div class="applicant-detail">
+        <div class="applicant-detail-header">
+            <div class="applicant-avatar large">
+                {{ application.seeker.user.username|slice:":1"|upper }}
+            </div>
+            <div class="applicant-detail-info">
+                <h1>{{ application.seeker.user.username }}</h1>
+                <p>{{ application.seeker.user.email }}</p>
+                <p>📱 {{ application.seeker.mobile }}</p>
+            </div>
+            <div class="ats-score-large">
+                <span class="score">{{ application.ats_score|floatformat:0 }}%</span>
+                <span class="label">ATS Match</span>
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-section">
+                <h2>Profile Information</h2>
+                <dl>
+                    <dt>Experience</dt>
+                    <dd>{{ application.seeker.experience_years }} years</dd>
+                    
+                    <dt>Education</dt>
+                    <dd>{{ application.seeker.education|default:"Not specified" }}</dd>
+                    
+                    <dt>Location</dt>
+                    <dd>{{ application.seeker.location|default:"Not specified" }}</dd>
+                </dl>
+            </div>
+
+            <div class="detail-section">
+                <h2>Skills</h2>
+                <div class="job-tags">
+                    {% for skill in application.seeker.get_skills_list %}
+                        <span class="tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if application.seeker.bio %}
+                <div class="detail-section full-width">
+                    <h2>About</h2>
+                    <p>{{ application.seeker.bio }}</p>
+                </div>
+            {% endif %}
+
+            {% if application.cover_letter %}
+                <div class="detail-section full-width">
+                    <h2>Cover Letter</h2>
+                    <p>{{ application.cover_letter|linebreaks }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="detail-actions">
+            {% if application.seeker.resume %}
+                <a href="{{ application.seeker.resume.url }}" target="_blank" class="btn btn-primary">📄 Download Resume</a>
+            {% endif %}
+            
+            <form method="POST" action="{% url 'update_application_status' application.pk %}" class="inline-form">
+                {% csrf_token %}
+                <select name="status" class="status-select">
+                    {% for value, label in application.STATUS_CHOICES %}
+                        <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-outline">Update Status</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

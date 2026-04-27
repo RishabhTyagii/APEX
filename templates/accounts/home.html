@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}JobPortal - Find Your Dream Job{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Find Your Dream Job</h1>
+        <p>Connect with top employers and discover opportunities that match your skills</p>
+        
+        <form class="hero-search" action="{% url 'job_list' %}" method="GET">
+            <input type="text" name="q" placeholder="Search jobs, skills, companies..." class="search-input">
+            <button type="submit" class="btn btn-primary">Search Jobs</button>
+        </form>
+        
+        <div class="hero-cta">
+            <a href="{% url 'register_seeker' %}" class="btn btn-primary btn-lg">Start Job Search</a>
+            <a href="{% url 'register_recruiter' %}" class="btn btn-outline btn-lg">Hire Talent</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <h2 class="section-title">Why Choose JobPortal?</h2>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Smart Matching</h3>
+                <p>AI-powered recommendations based on your skills and experience</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Mobile Ready</h3>
+                <p>Install as an app on your phone. Apply on the go!</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>ATS Scoring</h3>
+                <p>See how well your resume matches each job posting</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Track Applications</h3>
+                <p>Monitor your application status in real-time</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

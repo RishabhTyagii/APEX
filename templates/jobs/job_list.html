@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Jobs - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Browse Jobs</h1>
+    </div>
+
+    <div class="search-filters">
+        <form method="GET" class="filter-form">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search jobs..." class="search-input">
+            
+            <select name="type" class="filter-select">
+                <option value="">All Types</option>
+                {% for value, label in job_types %}
+                    <option value="{{ value }}" {% if job_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    {% if jobs %}
+        <div class="job-list">
+            {% for job in jobs %}
+                <div class="job-list-item">
+                    <div class="job-list-main">
+                        <h3>
+                            <a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a>
+                            {% if job.match_score %}
+                                <span class="match-badge">{{ job.match_score }} matches</span>
+                            {% endif %}
+                        </h3>
+                        <p class="company-name">{{ job.recruiter.company_name }}</p>
+                        
+                        <div class="job-meta">
+                            <span>📍 {{ job.location }}</span>
+                            <span>💼 {{ job.get_job_type_display }}</span>
+                            {% if job.salary_min and job.salary_max %}
+                                <span>💰 ₹{{ job.salary_min|floatformat:0 }} - ₹{{ job.salary_max|floatformat:0 }}</span>
+                            {% endif %}
+                            <span>📅 {{ job.created_at|timesince }} ago</span>
+                        </div>
+                        
+                        <div class="job-tags">
+                            {% for skill in job.get_skills_list|slice:":5" %}
+                                <span class="tag">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="job-list-action">
+                        <a href="{% url 'job_detail' job.pk %}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>No jobs found</h2>
+            <p>Try adjusting your search criteria</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

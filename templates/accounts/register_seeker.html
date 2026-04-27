@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Register as Job Seeker - JobPortal{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Create Seeker Account</h1>
+        <p class="auth-subtitle">Start your job search journey</p>
+        
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <span class="error">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+            <p>Want to hire? <a href="{% url 'register_recruiter' %}">Register as Recruiter</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

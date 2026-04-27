@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="job-detail">
+        <div class="job-detail-header">
+            <div class="job-detail-title">
+                <h1>{{ job.title }}</h1>
+                <p class="company-name">{{ job.recruiter.company_name }}</p>
+            </div>
+            
+            {% if user.is_authenticated and user.seeker_profile %}
+                {% if already_applied %}
+                    <div class="application-status">
+                        <span class="status status-{{ application.status }}">{{ application.get_status_display }}</span>
+                        <p>Applied {{ application.applied_at|timesince }} ago</p>
+                    </div>
+                {% else %}
+                    <a href="{% url 'apply_job' job.pk %}" class="btn btn-primary btn-lg">Apply Now</a>
+                {% endif %}
+            {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary btn-lg">Login to Apply</a>
+            {% endif %}
+        </div>
+
+        <div class="job-detail-meta">
+            <div class="meta-item">
+                <span class="meta-icon">📍</span>
+                <span>{{ job.location }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-icon">💼</span>
+                <span>{{ job.get_job_type_display }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-icon">📊</span>
+                <span>{{ job.experience_required }}+ years experience</span>
+            </div>
+            {% if job.salary_min and job.salary_max %}
+                <div class="meta-item">
+                    <span class="meta-icon">💰</span>
+                    <span>₹{{ job.salary_min|floatformat:0 }} - ₹{{ job.salary_max|floatformat:0 }}</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="job-detail-section">
+            <h2>Required Skills</h2>
+            <div class="job-tags">
+                {% for skill in job.get_skills_list %}
+                    <span class="tag">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="job-detail-section">
+            <h2>Job Description</h2>
+            <div class="job-description">
+                {{ job.description|linebreaks }}
+            </div>
+        </div>
+
+        <div class="job-detail-section">
+            <h2>About {{ job.recruiter.company_name }}</h2>
+            <p>{{ job.recruiter.company_description|default:"No company description available." }}</p>
+            {% if job.recruiter.company_website %}
+                <a href="{{ job.recruiter.company_website }}" target="_blank" class="btn btn-outline">Visit Website</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

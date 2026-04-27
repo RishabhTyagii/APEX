@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - JobPortal{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Welcome Back</h1>
+        <p class="auth-subtitle">Login to your account</p>
+        
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <span class="error">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Don't have an account?</p>
+            <a href="{% url 'register_seeker' %}">Register as Job Seeker</a>
+            <span class="divider">or</span>
+            <a href="{% url 'register_recruiter' %}">Register as Recruiter</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

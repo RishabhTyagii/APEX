@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Post a Job - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1>Post a New Job</h1>
+        
+        <form method="POST" class="job-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                {% for field in form %}
+                    <div class="form-group {% if field.name == 'description' or field.name == 'required_skills' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <span class="error">{{ field.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Post Job</button>
+                <a href="{% url 'recruiter_jobs' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

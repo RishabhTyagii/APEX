@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header">
+        <h1>Welcome, {{ user.username }}! 👋</h1>
+        <p class="user-role">
+            {% if role == 'seeker' %}
+                Job Seeker
+            {% else %}
+                Recruiter at {{ profile.company_name }}
+            {% endif %}
+        </p>
+    </div>
+
+    {% if role == 'seeker' %}
+        <!-- Seeker Dashboard -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <span class="stat-number">{{ user.seeker_profile.applications.count }}</span>
+                <span class="stat-label">Applications</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ recommended_jobs|length }}</span>
+                <span class="stat-label">Matching Jobs</span>
+            </div>
+        </div>
+
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Recommended Jobs</h2>
+                <a href="{% url 'job_list' %}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            
+            {% if recommended_jobs %}
+                <div class="job-grid">
+                    {% for job in recommended_jobs %}
+                        <div class="job-card">
+                            <div class="job-card-header">
+                                <h3>{{ job.title }}</h3>
+                                <span class="match-badge">{{ job.match_score }} skills match</span>
+                            </div>
+                            <p class="company-name">{{ job.recruiter.company_name }}</p>
+                            <p class="job-location">📍 {{ job.location }}</p>
+                            <div class="job-tags">
+                                {% for skill in job.get_skills_list|slice:":3" %}
+                                    <span class="tag">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                            <a href="{% url 'job_detail' job.pk %}" class="btn btn-primary btn-sm">View Job</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>Update your skills to see matching jobs!</p>
+                    <a href="{% url 'seeker_profile' %}" class="btn btn-primary">Update Profile</a>
+                </div>
+            {% endif %}
+        </section>
+
+    {% else %}
+        <!-- Recruiter Dashboard -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <span class="stat-number">{{ my_jobs.count }}</span>
+                <span class="stat-label">Posted Jobs</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">
+                    {% with total=0 %}
+                        {% for job in my_jobs %}
+                            {% with total=total|add:job.applications.count %}{% endwith %}
+                        {% endfor %}
+                        {{ total }}
+                    {% endwith %}
+                </span>
+                <span class="stat-label">Total Applications</span>
+            </div>
+        </div>
+
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Your Job Postings</h2>
+                <a href="{% url 'post_job' %}" class="btn btn-primary btn-sm">Post New Job</a>
+            </div>
+            
+            {% if my_jobs %}
+                <div class="jobs-table-container">
+                    <table class="jobs-table">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Applications</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in my_jobs %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ job.title }}</strong>
+                                        <small>{{ job.location }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge">{{ job.applications.count }}</span>
+                                    </td>
+                                    <td>
+                                        {% if job.is_active %}
+                                            <span class="status status-active">Active</span>
+                                        {% else %}
+                                            <span class="status status-inactive">Closed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'job_applications' job.pk %}" class="btn btn-sm">View Applications</a>
+                                        <a href="{% url 'edit_job' job.pk %}" class="btn btn-outline btn-sm">Edit</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>You haven't posted any jobs yet.</p>
+                    <a href="{% url 'post_job' %}" class="btn btn-primary">Post Your First Job</a>
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

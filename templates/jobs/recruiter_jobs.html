@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}My Jobs - JobPortal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>My Job Postings</h1>
+        <a href="{% url 'post_job' %}" class="btn btn-primary">Post New Job</a>
+    </div>
+
+    {% if jobs %}
+        <div class="jobs-table-container">
+            <table class="jobs-table">
+                <thead>
+                    <tr>
+                        <th>Job Title</th>
+                        <th>Location</th>
+                        <th>Applications</th>
+                        <th>Status</th>
+                        <th>Posted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                        <tr>
+                            <td><strong>{{ job.title }}</strong></td>
+                            <td>{{ job.location }}</td>
+                            <td><span class="badge">{{ job.applications.count }}</span></td>
+                            <td>
+                                {% if job.is_active %}
+                                    <span class="status status-active">Active</span>
+                                {% else %}
+                                    <span class="status status-inactive">Closed</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ job.created_at|date:"M d, Y" }}</td>
+                            <td class="actions">
+                                <a href="{% url 'job_applications' job.pk %}" class="btn btn-sm">Applications</a>
+                                <a href="{% url 'edit_job' job.pk %}" class="btn btn-outline btn-sm">Edit</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>No jobs posted yet</h2>
+            <p>Start hiring by posting your first job</p>
+            <a href="{% url 'post_job' %}" class="btn btn-primary">Post a Job</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

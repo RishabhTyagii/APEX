@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yourbaazar-v1';
+const CACHE_NAME = 'findj-v1';
 
 const urlsToCache = [
   '/',
